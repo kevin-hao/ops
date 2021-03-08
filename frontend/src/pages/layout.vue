@@ -31,3 +31,11 @@
     }
   }
 </script>
+
+<style scoped>
+.el-header{
+  padding: 0;
+  z-index: 1000;
+}
+</style>
+
