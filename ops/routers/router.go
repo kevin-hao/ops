@@ -19,4 +19,6 @@ func init() {
 	}))
 	beego.AutoRouter(&controllers.AuthController{})
 	beego.AutoRouter(&controllers.UserController{})
+	beego.AutoRouter(&controllers.JenkinsController{})
+	beego.AutoRouter(&controllers.JenkinsTemplateController{})
 }
