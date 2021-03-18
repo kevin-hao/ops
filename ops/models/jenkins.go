@@ -8,6 +8,7 @@ import (
 type JenkinsJob struct {
 	ID         int        `json:"id" orm:"column(id)"`
 	Name       string     `json:"name" orm:"size(64);unique"`
+	Content    string     `son:"name" orm:"type(text)"`
 	CreatedAt  *time.Time `json:"created_at" orm:"auto_now_add"`
 	UpdatedAt  *time.Time `json:"updated_at" orm:"auto_now"`
 	DeletedAt  *time.Time `json:"deleted_at" orm:"null"`

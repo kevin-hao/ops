@@ -6,7 +6,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/bndr/gojenkins"
 	"github.com/astaxie/beego/orm"
-	"fmt"
+	
 	"strings"
 )
 
@@ -42,15 +42,15 @@ func (c *jenkinsService) CreateJob(form *forms.JenkinsForm) *models.JenkinsJob {
 	template := &models.JenkinsTemplate{ID: form.JenkinsTemplate}
 	ormer := orm.NewOrm()
 	if err := ormer.Read(template); err == nil {
-
+		job := c.GetJob(template.Name)
+		conf, _ := job.GetConfig()
+		conf = strings.Replace(conf, template.Name, form.Name, -1)
 		jenkin_job := &models.JenkinsJob{
 			Name: form.Name,
 			JenkinsTemplate: template,
+			Content: conf,
 		}
 		if _, err := orm.NewOrm().Insert(jenkin_job); err == nil {
-			job := c.GetJob(template.Name)
-			conf, _ := job.GetConfig()
-			conf = strings.Replace(conf, template.Name, form.Name, -1)
 			_, err = jenkins.CreateJob(conf, form.Name)
 			if err == nil {
 				return jenkin_job
@@ -123,18 +123,16 @@ func (c *jenkinsTemplateService) GetTemplateByName(name string) *models.JenkinsT
 func (c *jenkinsTemplateService) GetById(id int) *models.JenkinsTemplate {
 	template := &models.JenkinsTemplate{ID: id}
 	ormer := orm.NewOrm()
-	fmt.Println("read:", ormer.Read(template))
 	if err := ormer.Read(template); err != nil {
-		// fmt.Println(template)
 		return template
 	}
 	return nil
 }
 
 func (c *jenkinsTemplateService) Modify(form *forms.JenkinsTemplateForm) *models.JenkinsTemplate {
-	fmt.Println(form.ID)
+	
 	if template := c.GetById(form.ID); template != nil{
-		fmt.Println(template)
+		
 		return template
 	}
 	return nil
