@@ -16,11 +16,11 @@ import (
 
 func main() {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&loc=PRC&parseTime=true",
-		beego.AppConfig.DefaultString("mysql::User", ""),
-		beego.AppConfig.DefaultString("mysql::Password", ""),
-		beego.AppConfig.DefaultString("mysql::Host", ""),
-		beego.AppConfig.DefaultString("mysql::Port", ""),
-		beego.AppConfig.DefaultString("mysql::DBName", ""),
+		beego.AppConfig.DefaultString("mysql::User", "User"),
+		beego.AppConfig.DefaultString("mysql::Password", "Password"),
+		beego.AppConfig.DefaultString("mysql::Host", "Host"),
+		beego.AppConfig.DefaultString("mysql::Port", "Port"),
+		beego.AppConfig.DefaultString("mysql::DBName", "DBName"),
 	)
 	orm.RegisterDriver("mysql", orm.DRMySQL)
 	orm.RegisterDataBase("default", "mysql", dsn)

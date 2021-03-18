@@ -17,6 +17,7 @@ func (c *JenkinsController) CreateJob() {
 
 	if c.Ctx.Input.IsPost() {
 		if err := c.ParseForm(form); err == nil{
+			
 			if res := services.JenkinsService.GetJobByName(form.Name); res != nil {
 				c.Data["json"] = map[string]interface{}{"code": 0, "msg": fmt.Sprintf("job %s 已存在", form.Name)}
 				c.ServeJSON()
@@ -36,6 +37,17 @@ func (c *JenkinsController) CreateJob() {
 				}
 			}
 		}
+	}
+	c.Data["json"] = map[string]interface{}{"code": 1, "msg": "bad request method"}
+	c.ServeJSON()
+}
+
+func (c *JenkinsController) DeleteJob(){
+	if c.Ctx.Input.IsPost() {
+		id, _ := c.GetInt("id")
+		services.JenkinsService.DeleteJob(id)
+		c.Data["json"] = map[string]interface{}{"code": 0, "msg": "删除成功"}
+	    c.ServeJSON()
 	}
 	c.Data["json"] = map[string]interface{}{"code": 1, "msg": "bad request method"}
 	c.ServeJSON()
@@ -76,7 +88,7 @@ func (c *JenkinsTemplateController) Modify(){
 		}
 		
 		c.Data["json"] = map[string]interface{}{"code": 0, "msg": "failed"}
-	    c.ServeJSON()
+		c.ServeJSON()
 		
 	}
 	c.Data["json"] = map[string]interface{}{"code": 1, "msg": "bad request method"}

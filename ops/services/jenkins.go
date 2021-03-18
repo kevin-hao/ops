@@ -29,12 +29,11 @@ func (c *jenkinsService) GetJenkins() *gojenkins.Jenkins {
 func (c *jenkinsService) GetJobByName(name string) *models.JenkinsJob{
 	jenkin_job := &models.JenkinsJob{Name: name}
 	ormer := orm.NewOrm()
-	err := ormer.Read(jenkin_job)
-	if err == nil {
+	
+	if err := ormer.Read(jenkin_job, "Name"); err == nil {
 		return jenkin_job
-	} else {
-		return nil
-	}
+	} 
+	return nil
 
 }
 
@@ -60,6 +59,33 @@ func (c *jenkinsService) CreateJob(form *forms.JenkinsForm) *models.JenkinsJob {
 	}
 	return nil
 }
+
+func (c *jenkinsService) getJobById(id int) *models.JenkinsJob {
+	ormer := orm.NewOrm()
+	job := &models.JenkinsJob{ID: id}
+	if err := ormer.Read(job); err == nil {
+		return job
+	}
+	return nil
+	
+}
+
+func (c *jenkinsService) DeleteJob(id int) *models.JenkinsJob {
+	jenkins := c.GetJenkins()
+	ormer := orm.NewOrm()
+	job := c.getJobById(id)
+	if  job != nil {
+		id := job.ID
+		name := job.Name
+		if _, err := ormer.Delete(&models.JenkinsJob{ID: id}); err == nil {
+			if _, res := jenkins.DeleteJob(name); res == nil {
+				return nil
+			}	
+		}
+	}
+	return job
+}
+
 
 func (c *jenkinsService) GetJob(name string) *gojenkins.Job {
 	jenkins := c.GetJenkins()
