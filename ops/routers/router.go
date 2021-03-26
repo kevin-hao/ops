@@ -21,4 +21,5 @@ func init() {
 	beego.AutoRouter(&controllers.UserController{})
 	beego.AutoRouter(&controllers.JenkinsController{})
 	beego.AutoRouter(&controllers.JenkinsTemplateController{})
+	beego.AutoRouter(&controllers.MenusController{})
 }

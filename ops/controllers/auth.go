@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"fmt"
+	"encoding/json"
 	"ops/base/controllers/base"
+	"ops/base/response"
+	"ops/forms"
 	"ops/services"
-
-	"github.com/astaxie/beego"
+	"ops/utils"
 )
 
 type AuthController struct {
@@ -13,45 +14,32 @@ type AuthController struct {
 }
 
 func (c *AuthController) Login() {
-	sessionKey := beego.AppConfig.DefaultString("auth::SessionKey", "user")
-	fmt.Println("sessionKey: ", sessionKey)
-	sessionUser := c.GetSession(sessionKey)
-	fmt.Println("sessionUser: ", sessionUser)
-	// if sessionUser != nil {
-	// 	fmt.Println(sessionUser)
-	// 	// action := beego.AppConfig.DefaultString("auth::HomeAction", "HomeController.Index")
-	// 	// c.Redirect(beego.URLFor(action), http.StatusFound)
-	// 	// return
-	// }
+	form := &forms.LoginForm{}
 	if c.Ctx.Input.IsPost() {
-		username := c.GetString("username")
-		password := c.GetString("password")
-
-		user := services.UserService.GetByName(username)
-		if user == nil {
-			//c.Data["json"] = map[string]interface{}{"code": 1, "msg": "username not exist"}
-			c.Data["json"] = map[string]interface{}{"code": 1}
-			c.ServeJSON()
-
-		} else if user.ValidPassword(password) {
-			//c.Data["json"] = map[string]interface{}{"code": 2, "msg": user}
-			sessionKey := beego.AppConfig.DefaultString("auth::SessionKey", "user")
-			c.SetSession(sessionKey, user.ID)
-			c.Data["json"] = map[string]interface{}{"code": 0}
-			c.ServeJSON()
-
+		if err := c.ParseForm(form); err == nil {
+			form_data := string(c.Ctx.Input.RequestBody)
+			data := make(map[string]string)
+			err := json.Unmarshal([]byte(form_data), &data)
+			if err == nil {
+				form.Name = data["username"]
+				form.Password = data["password"]
+			}
+			if user := services.UserService.GetByName(form.Name); user == nil {
+				c.Data["json"] = map[string]interface{}{"code": 403, "message": "no user", "data": nil}
+				c.ServeJSON()
+			} else if user.ValidPassword(form.Password) {
+				token := utils.GenerateToken(form.Name)
+				// data := map[string]interface{}{"token": token}
+				c.Data["json"] = map[string]interface{}{"code": 200, "message": "success", "token": token}
+				c.ServeJSON()
+			}
 		} else {
-
-			//c.Data["json"] = map[string]interface{}{"code": 2, "msg": "username or password is wrong"}
-			c.Data["json"] = map[string]interface{}{"code": 2}
+			c.Data["json"] = map[string]interface{}{"code": 400, "message": "failed", "data": nil}
 			c.ServeJSON()
 		}
-	} else {
-		//c.Data["json"] = map[string]interface{}{"code": 3, "msg": "bad request method"}
-		c.Data["json"] = map[string]interface{}{"code": 3}
-		c.ServeJSON()
-
 	}
+	c.Data["json"] = response.BadResquest
+	c.ServeJSON()
 
 }
 
