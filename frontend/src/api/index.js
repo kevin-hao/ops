@@ -17,6 +17,13 @@ export function getUserInfo(data) {
     data
   });
 }
+export function getMoveRouter() {
+  return request({
+    url: "/menus/getallmenus",
+    method: "get",
+  });
+}
+
 //退出
 export function logout() {
   return request({

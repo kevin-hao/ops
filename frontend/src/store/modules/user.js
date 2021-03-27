@@ -1,5 +1,5 @@
 import { logout } from "@/api/user";
-import { login, getUserInfo } from "@/api/index";
+import { login, getUserInfo, getMoveRouter } from "@/api/index";
 import { getToken, setToken, removeToken } from "@/utils/auth";
 import { resetRouter } from "@/router";
 
@@ -7,7 +7,8 @@ const getDefaultState = () => {
   return {
     token: getToken(),
     name: "",
-    avatar: ""
+    avatar: "",
+    menus: "",  //存放路由表的容器
   };
 };
 
@@ -25,6 +26,9 @@ const mutations = {
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar;
+  },
+  SET_MENU: (state, menus) => {
+    state.menus = menus;
   }
 };
 
@@ -33,8 +37,7 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo;
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password })
-        .then(response => {
+      login({ username: username.trim(), password: password }).then(response => {
           //const { data } = response;
           commit("SET_TOKEN", response.token);
           setToken(response.token);
@@ -49,8 +52,7 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getUserInfo()
-        .then(response => {
+      getUserInfo().then(response => {
           const { data } = response;
           if (!data) {
             return reject("Verification failed, please Login again.");
@@ -60,6 +62,33 @@ const actions = {
           commit("SET_NAME", name);
           commit("SET_AVATAR", avatar);
           resolve(data);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  },
+
+  // get router
+  getRouter({ commit, state }) {
+    return new Promise((resolve, reject) => {
+      getMoveRouter().then(response => {
+          const menus = response.data;
+          //如果需要404页面，在这里添加
+          menus.push(
+          {
+            path: "/404",
+            component: "404",
+            hidden: true
+          },
+          {
+            path: "*",
+            component: "404",
+            hidden: true
+          }
+          )
+          commit("SET_MENU", menus);
+          resolve();
         })
         .catch(error => {
           reject(error);
