@@ -1,12 +1,13 @@
 package services
 
 import (
-	"ops/models"
 	"ops/forms"
+	"ops/models"
+
 	"github.com/astaxie/beego"
-	"github.com/bndr/gojenkins"
 	"github.com/astaxie/beego/orm"
-	
+	"github.com/bndr/gojenkins"
+
 	"strings"
 )
 
@@ -26,13 +27,13 @@ func (c *jenkinsService) GetJenkins() *gojenkins.Jenkins {
 	return jenkins
 }
 
-func (c *jenkinsService) GetJobByName(name string) *models.JenkinsJob{
+func (c *jenkinsService) GetJobByName(name string) *models.JenkinsJob {
 	jenkin_job := &models.JenkinsJob{Name: name}
 	ormer := orm.NewOrm()
-	
+
 	if err := ormer.Read(jenkin_job, "Name"); err == nil {
 		return jenkin_job
-	} 
+	}
 	return nil
 
 }
@@ -46,9 +47,9 @@ func (c *jenkinsService) CreateJob(form *forms.JenkinsForm) *models.JenkinsJob {
 		conf, _ := job.GetConfig()
 		conf = strings.Replace(conf, template.Name, form.Name, -1)
 		jenkin_job := &models.JenkinsJob{
-			Name: form.Name,
+			Name:            form.Name,
 			JenkinsTemplate: template,
-			Content: conf,
+			Content:         conf,
 		}
 		if _, err := orm.NewOrm().Insert(jenkin_job); err == nil {
 			_, err = jenkins.CreateJob(conf, form.Name)
@@ -67,25 +68,24 @@ func (c *jenkinsService) getJobById(id int) *models.JenkinsJob {
 		return job
 	}
 	return nil
-	
+
 }
 
 func (c *jenkinsService) DeleteJob(id int) *models.JenkinsJob {
 	jenkins := c.GetJenkins()
 	ormer := orm.NewOrm()
 	job := c.getJobById(id)
-	if  job != nil {
+	if job != nil {
 		id := job.ID
 		name := job.Name
 		if _, err := ormer.Delete(&models.JenkinsJob{ID: id}); err == nil {
 			if _, res := jenkins.DeleteJob(name); res == nil {
 				return nil
-			}	
+			}
 		}
 	}
 	return job
 }
-
 
 func (c *jenkinsService) GetJob(name string) *gojenkins.Job {
 	jenkins := c.GetJenkins()
@@ -96,13 +96,12 @@ func (c *jenkinsService) GetJob(name string) *gojenkins.Job {
 	return nil
 }
 
-type jenkinsTemplateService struct{
-
+type jenkinsTemplateService struct {
 }
 
 func (c *jenkinsTemplateService) CreateTemplate(name, content string) *models.JenkinsTemplate {
 	template := &models.JenkinsTemplate{
-		Name: name,
+		Name:    name,
 		Content: content,
 	}
 	if _, err := orm.NewOrm().Insert(template); err == nil {
@@ -111,7 +110,7 @@ func (c *jenkinsTemplateService) CreateTemplate(name, content string) *models.Je
 	return nil
 }
 
-func (c *jenkinsTemplateService) GetTemplateByName(name string) *models.JenkinsTemplate{
+func (c *jenkinsTemplateService) GetTemplateByName(name string) *models.JenkinsTemplate {
 	template := &models.JenkinsTemplate{Name: name}
 	ormer := orm.NewOrm()
 	if err := ormer.Read(template); err != nil {
@@ -130,15 +129,13 @@ func (c *jenkinsTemplateService) GetById(id int) *models.JenkinsTemplate {
 }
 
 func (c *jenkinsTemplateService) Modify(form *forms.JenkinsTemplateForm) *models.JenkinsTemplate {
-	
-	if template := c.GetById(form.ID); template != nil{
-		
+
+	if template := c.GetById(form.ID); template != nil {
+
 		return template
 	}
 	return nil
 }
-
-
 
 var JenkinsService = new(jenkinsService)
 var JenkinsTemplateService = new(jenkinsTemplateService)

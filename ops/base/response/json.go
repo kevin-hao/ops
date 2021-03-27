@@ -2,7 +2,7 @@ package response
 
 type JSONResponse struct {
 	Code    int         `json:"code"`
-	Message string      `json:"msg"`
+	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
 }
 
@@ -15,4 +15,5 @@ var (
 	Ok              = NewJsonResponse(200, "ok", nil)
 	BadResquest     = NewJsonResponse(400, "bad request", nil)
 	InvalidToken    = NewJsonResponse(403, "token is invalid", nil)
+	NotAcceptable   = NewJsonResponse(406, "Not Acceptable", nil)
 )

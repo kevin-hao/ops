@@ -24,6 +24,18 @@ type Menus struct {
 	DeletedAt  *time.Time `json:"deleted_at" orm:"null"`
 }
 
+func (m *Menus) TypeText() string {
+	switch m.Type {
+	case 1:
+		return "目录"
+	case 2:
+		return "菜单"
+	case 3:
+		return "按钮"
+	}
+	return "未知"
+}
+
 func init() {
 	orm.RegisterModel(new(Menus))
 }
