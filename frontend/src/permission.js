@@ -40,12 +40,12 @@ router.beforeEach(async(to, from, next) => {
             next()
           }
           const menus = filterAsyncRouter(store.getters.menus) //过滤路由
-          console.log(menus)
+
           router.addRoutes(menus) //动态添加路由
           global.antRouter = menus //将路由数据传递给全局变量，做侧边栏渲染工作
           next({...to, replace:true})
         } catch (error) {
-          
+
           // remove token and go to login page to re-login
           await store.dispatch('user/resetToken')
           Message.error(error || 'Has Error')
@@ -89,7 +89,7 @@ function filterAsyncRouter(asyncRouterMap) {
       }
 
     }
-    console.log(route.children)
+    
     if (route.children  && route.children.length) {
 
       route.children = filterAsyncRouter(route.children)
