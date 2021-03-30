@@ -45,6 +45,6 @@ func (c *AuthController) Login() {
 
 func (c *AuthController) Logout() {
 	c.DestroySession()
-	c.Data["json"] = map[string]interface{}{"code": 0}
+	c.Data["json"] = response.NewJsonResponse(200, "logout", nil)
 	c.ServeJSON()
 }

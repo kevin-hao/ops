@@ -41,3 +41,34 @@ func (c *MenusController) GetAllMenus() {
 	c.ServeJSON()
 
 }
+
+func (c *MenusController) GetMenuList() {
+	if c.Ctx.Input.IsGet() {
+		token := c.Ctx.Request.Header["Token"]
+
+		KEY := beego.AppConfig.DefaultString("token::Key", "OPS")
+		if len(token) == 0 {
+			c.Data["json"] = response.NotAcceptable
+			c.ServeJSON()
+		}
+		claims, err := utils.ParseToken(token[0], []byte(KEY))
+		if err != nil {
+			c.Data["json"] = response.InvalidToken
+			c.ServeJSON()
+		}
+		username := claims["username"]
+
+		id, _ := c.GetInt("id")
+		if user := services.UserService.GetByName(username.(string)); user != nil {
+			if menus := services.MenuService.GetMenuList(id); menus != nil {
+				c.Data["json"] = response.NewJsonResponse(200, "获取路由成功", menus)
+				c.ServeJSON()
+			}
+		}
+
+		c.Data["json"] = response.InvalidToken
+		c.ServeJSON()
+	}
+	c.Data["json"] = response.BadResquest
+	c.ServeJSON()
+}

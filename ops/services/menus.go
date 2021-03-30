@@ -84,12 +84,12 @@ func (c *menuService) genMenu(parent *models.Menus) []map[string]interface{} {
 
 	if parent.Hidden == "1" {
 		hidden = false
-		
+
 	} else {
 		hidden = true
-		
+
 	}
-	
+
 	if parent.AlwaysShow == "" {
 		alwaysShow = false
 	} else {
@@ -102,7 +102,6 @@ func (c *menuService) genMenu(parent *models.Menus) []map[string]interface{} {
 	}
 
 	t_menus = map[string]interface{}{"id": parent.ID, "pid": parent.Pid, "hidden": hidden, "type": parent.TypeText(), "path": parent.Path, "component": parent.Component, "alwaysShow": alwaysShow, "redirect": parent.Redirect, "name": parent.Name, "created_at": parent.CreatedAt, "updated_at": parent.UpdatedAt, "meta": map[string]interface{}{"icon": parent.Icon, "title": parent.Title, "noCache": noCache}}
-	
 
 	t_allMenus = append(t_allMenus, t_menus)
 
@@ -111,7 +110,6 @@ func (c *menuService) genMenu(parent *models.Menus) []map[string]interface{} {
 	if childs != nil {
 		var children []map[string]interface{}
 		for _, child := range childs {
-			
 
 			var c_menus map[string]interface{}
 			var c_hidden bool
@@ -122,9 +120,9 @@ func (c *menuService) genMenu(parent *models.Menus) []map[string]interface{} {
 				c_hidden = false
 			} else {
 				c_hidden = true
-				
+
 			}
-			
+
 			if child.AlwaysShow == "" {
 				c_alwaysShow = false
 			} else {
@@ -169,6 +167,18 @@ func (c *menuService) GetAllMenus() []map[string]interface{} {
 	}
 
 	return Menus
+
+}
+
+func (c *menuService) GetMenuList(id int) []*models.Menus {
+	var menus []*models.Menus
+
+	ormer := orm.NewOrm()
+	if _, err := ormer.QueryTable("menus").Filter("pid", id).All(&menus); err == nil {
+
+		return menus
+	}
+	return nil
 
 }
 
